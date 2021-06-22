@@ -1,19 +1,86 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>HTML5 Canvas</title>
-</head>
-<body>
-<canvas id="draw" width="800" height="800"></canvas>
-<script>
-</script>
+  <head>
+    <meta charset="UTF-8" />
+    <title>HTML5 Canvas</title>
+  </head>
+  <body>
+    <canvas id="draw" width="800" height="800"></canvas>
+    <script>
+      const canvas = document.getElementById('draw')
+      const ctx = canvas.getContext('2d')
 
-<style>
-  html, body {
-    margin: 0;
-  }
-</style>
+      // determine window size
+      canvas.width = document.documentElement.clientWidth
+      canvas.height = document.documentElement.clientHeight
 
-</body>
+      let radius = 25
+      let dir = 1
+      const radMin = 10
+      const radMax = 50
+      let hue = 0
+      let color = `hsl(${hue},100%, 50%)`
+      let lastX, lastY
+
+      ctx.lineJoin = 'round'
+      ctx.lineCap = 'round'
+
+      const calcNew = () => {
+        // calc new color
+        hue = (hue + 1) % 360
+        color = `hsl(${hue},100%, 50%)`
+
+        // calc new radius
+        radius += dir
+        if (radius === radMax) dir = -1
+        if (radius === radMin) dir = 1
+      }
+      const fillBall = (centerX, centerY) => {
+        ctx.fillStyle = color
+        ctx.beginPath()
+        ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI)
+        ctx.fill()
+        calcNew()
+      }
+
+      const fillStroke = (x, y) => {
+        ctx.strokeStyle = color
+        ctx.lineWidth = radius
+        ctx.beginPath()
+        ctx.moveTo(x, y)
+        ctx.lineTo(lastX, lastY)
+        ;[lastX, lastY] = [x, y]
+        ctx.stroke()
+        calcNew()
+      }
+
+      let drawFlag = 0
+      canvas.addEventListener('mousedown', (e) => {
+        drawFlag = true
+        ;[lastX, lastY] = [e.x, e.y]
+        if (e.button === 0) drawFlag = 1
+        if (e.button === 2) {
+          drawFlag = 2
+        }
+      })
+      canvas.addEventListener('contextmenu', (e) => {
+        e.preventDefault()
+      })
+      canvas.addEventListener('mouseup', (e) => {
+        drawFlag = 0
+      })
+      canvas.addEventListener('mousemove', (e) => {
+        if (!drawFlag) return
+        if (drawFlag === 1) fillStroke(e.x, e.y)
+        if (drawFlag === 2) fillBall(e.x, e.y)
+      })
+    </script>
+
+    <style>
+      html,
+      body {
+        margin: 0;
+      }
+    </style>
+  </body>
 </html>
