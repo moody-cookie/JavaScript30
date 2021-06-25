@@ -1,56 +1,87 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>JS Reference VS Copy</title>
-</head>
-<body>
+  <head>
+    <meta charset="UTF-8" />
+    <title>JS Reference VS Copy</title>
+  </head>
+  <body>
+    <i>open le console</i>
+    <script>
+      // start with strings, numbers and booleans
 
-  <script>
-    // start with strings, numbers and booleans
+      // Let's say we have an array
+      const players = ['Wes', 'Sarah', 'Ryan', 'Poppy']
 
-    // Let's say we have an array
-    const players = ['Wes', 'Sarah', 'Ryan', 'Poppy'];
+      // and we want to make a copy of it.
+      let copyPlayers
+      // You might think we can just do something like this:
+      copyPlayers = players
+      // however what happens when we update that array?
+      players[4] = 'Mike'
+      // now here is the problem!
+      console.warn('copied looks like the original array!')
+      console.log(copyPlayers)
+      copyPlayers[5] = 'Jean'
+      console.warn('editing a copy makes original change too')
+      console.log(players)
+      // oh no - we have edited the original array too!
 
-    // and we want to make a copy of it.
+      // Why? It's because that is an array reference, not an array copy. They both point to the same array!
 
-    // You might think we can just do something like this:
+      // So, how do we fix this? We take a copy instead!
 
-    // however what happens when we update that array?
+      // one way
+      copyPlayers = players.slice()
+      players.pop()
+      console.log(players)
+      console.log(copyPlayers)
+      // or create a new array and concat the old one in
+      copyPlayers = [].concat(players)
+      players.pop()
+      console.log(players)
+      console.log(copyPlayers)
+      // or use the new ES6 Spread
+      copyPlayers = [...players]
+      players.pop()
+      console.log(players)
+      console.log(copyPlayers)
+      // now when we update it, the original one isn't changed
 
-    // now here is the problem!
+      // The same thing goes for objects, let's say we have a person object
 
-    // oh no - we have edited the original array too!
+      // with Objects
+      const person = {
+        name: 'Wes Bos',
+        age: 80,
+      }
 
-    // Why? It's because that is an array reference, not an array copy. They both point to the same array!
+      // and think we make a copy:
+      let copyPerson = person
+      person.status = 'mia'
+      console.group('naiive reference copy')
+      console.log(copyPerson)
+      console.log(person)
+      console.groupEnd('naiive reference copy')
+      // how do we take a copy instead?
+      copyPerson = Object.defineProperties(
+        {},
+        Object.getOwnPropertyDescriptors(person)
+      )
 
-    // So, how do we fix this? We take a copy instead!
-
-    // one way
-
-    // or create a new array and concat the old one in
-
-    // or use the new ES6 Spread
-
-    // now when we update it, the original one isn't changed
-
-    // The same thing goes for objects, let's say we have a person object
-
-    // with Objects
-    const person = {
-      name: 'Wes Bos',
-      age: 80
-    };
-
-    // and think we make a copy:
-
-    // how do we take a copy instead?
-
-    // We will hopefully soon see the object ...spread
-
-    // Things to note - this is only 1 level deep - both for Arrays and Objects. lodash has a cloneDeep method, but you should think twice before using it.
-
-  </script>
-
-</body>
+      copyPerson.status = 'alive'
+      console.group('copy with descriptors')
+      console.log(copyPerson)
+      console.log(person)
+      console.groupEnd('copy with descriptors')
+      // We will hopefully soon see the object ...spread
+      const copyPerson2 = { ...person }
+      copyPerson2.status = 'deceased'
+      console.group('obj spread')
+      console.log(copyPerson)
+      console.log(copyPerson2)
+      console.log(person)
+      console.groupEnd('obj spread')
+      // Things to note - this is only 1 level deep - both for Arrays and Objects. lodash has a cloneDeep method, but you should think twice before using it.
+    </script>
+  </body>
 </html>
