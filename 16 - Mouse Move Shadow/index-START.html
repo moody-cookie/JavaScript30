@@ -1,40 +1,81 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Mouse Shadow</title>
-</head>
-<body>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Mouse Shadow</title>
+  </head>
+  <body>
+    <div class="hero">
+      <h1 contenteditable>🔥WOAH!</h1>
+    </div>
 
-  <div class="hero">
-    <h1 contenteditable>🔥WOAH!</h1>
-  </div>
+    <style>
+      html {
+        color: black;
+        font-family: sans-serif;
+      }
 
-  <style>
-  html {
-    color: black;
-    font-family: sans-serif;
-  }
+      body {
+        margin: 0;
+      }
 
-  body {
-    margin: 0;
-  }
+      .hero {
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: black;
+      }
 
-  .hero {
-    min-height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    color: black;
-  }
+      h1 {
+        font-size: 100px;
+      }
+    </style>
 
-  h1 {
-    text-shadow: 10px 10px 0 rgba(0,0,0,1);
-    font-size: 100px;
-  }
-  </style>
+    <script>
+      const targetElement = document.querySelector('.hero h1')
+      const offsetX = targetElement.offsetLeft + targetElement.offsetWidth / 2
+      const offsetY = targetElement.offsetTop + targetElement.offsetHeight / 2
 
-<script>
-</script>
-</body>
+      const shadows = [
+        {
+          color: 'rgba(255, 0, 0, 1)',
+          calcCoords(mouseX, mouseY) {
+            return [(mouseX - offsetX) / 3, (mouseY - offsetY) / 3]
+          },
+        },
+        {
+          color: 'rgba(0, 255, 0, 1)',
+          calcCoords(mouseX, mouseY) {
+            return [(mouseY - offsetY) / 3, (mouseX - offsetX) / 3]
+          },
+        },
+        {
+          color: 'rgba(0, 0, 255, 1)',
+          calcCoords(mouseX, mouseY) {
+            return [-(mouseX - offsetX) / 3, -(mouseY - offsetY) / 3]
+          },
+        },
+        {
+          color: 'rgba(255, 255, 0, 1)',
+          calcCoords(mouseX, mouseY) {
+            return [-(mouseY - offsetY) / 3, -(mouseX - offsetX) / 3]
+          },
+        },
+      ]
+
+      const getShadowStyles = (e) =>
+        shadows.map((shade) => {
+          const [x, y] = shade.calcCoords(e.clientX, e.clientY)
+          return `${x}px ${y}px 0 ${shade.color}`
+        })
+
+      const mouseMoveHandle = (e) => {
+        const shadowStyles = getShadowStyles(e).join(', ')
+        targetElement.style.textShadow = shadowStyles
+      }
+
+      window.addEventListener('mousemove', mouseMoveHandle)
+    </script>
+  </body>
 </html>
